@@ -257,7 +257,7 @@ def processing(path_directory,mode):
 			f.write('\n')
 	print("\n", nb_quadra, "valid quadruplets have been found over",len(RegTrees), "trees and they have been stored in the file output.txt .\n")
 	print("\n There are", err, "non-valid trees (stored in the file outputErr.txt) and", len(EmpTrees),"empty trees (stored in the file outputEmp.txt).\n")
-	print("\nThere are",len(comptDist), "valid quadruplet(s) which aren't induced sub-tree(s) (",comptDist,")\n")
+	print("\nThere are",len(comptDist), "valid quadruplet(s) which aren't induced subtrees (",comptDist,")\n")
 	print("\nThere are",len(comptType), "valid quadruplet(s) which aren't organized according to the sequence AD,MU,MM,MA (",comptType,")\n")
 	return(None)
 

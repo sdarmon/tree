@@ -1,15 +1,15 @@
 # Quadruplets in Tree
 
-The goal of this project is to find particular quadruplet of sequences in phylogenetic trees.
+The goal of this project is to find particular quadruplets of sequences in phylogenetic trees.
 
 
 ## Data 
 
 
-The data used is phylogenetic trees. There are Newick Tree and each leaf of each tree matchs with an unique genetic sequence. There are three types of sequences :
+The data used is phylogenetic trees. They are Newick Trees and each leaf of each tree matches with an unique genetic sequence. There are three types of sequences :
 
 * ENS... : Correspond to original sequences of the phylogenetic tree (which can be found at https://www.ensembl.org/index.html )
-* TRA... and ADA... : Sequences added in the pylogenetic tree by the research team. We call them *special* sequences and they are divided into four additional species :
+* TRA... and ADA... : Sequences added in the phylogenetic tree by the research team. We call them *special* sequences and they are divided into four additional species :
 
 	+ AD... : Spiny Mouse (Acomys Dimidiatus)
 	+ MU... : Gerbil (Meriones Unguiculatus)
@@ -32,7 +32,7 @@ Thus, the study of such trees can provide information about how genes had evolve
 
 ## Validity of a tree and a quadruplet
 
-A tree is said *valid* if it has exactly the same number of each sequences and if we can divide each quadruplet from the others but taking an induced subtree (i.e. we can cut the tree in such a way that each induced subtree has exactly one quadruplet).
+A tree is said *valid* if it has exactly the same number of each special sequence and if we can divide each quadruplet from the others by taking an induced subtree (i.e. we can cut the tree in such a way that each induced subtree has exactly one quadruplet).
 
 In addition, a quadruplet is said *valid*, if there exists such an induced subtree containing exactly that quadruplet and no additional special sequences.
 
@@ -78,9 +78,9 @@ python3 tree.py dir
 
 First it will print some statistics on the trees and the numbers of quadruplets and most of all, it will create 3 text files :
 
-* `output.txt` : Each line of this file is following this format (the words are separeted with one tab): `tree type1 type2 ... typeN quadra1 quadra2 ... quadraN` where `tree` is the name of the analysed tree, `type1`, `type2`, ...., `typeN` are the type of the `N` quadruplets found in that tree and `quadra1`, `quadra2`, ..., `quadraN` are the actual subtree of each quadruplet.
-* `outputErr.txt` : it contains the name of non-valid trees.
-* `outputEmp.txt` : it contains the name of trees which don't have any sequences of the quadruplet.
+* `output.txt` : Each line of this file is following this format (the words are separated with one tab): `tree type1 type2 ... typeN quadra1 quadra2 ... quadraN` where `tree` is the name of the analysed tree, `type1`, `type2`, ...., `typeN` are the type of the `N` quadruplets found in that tree and `quadra1`, `quadra2`, ..., `quadraN` are the actual subtree of each quadruplet.
+* `outputErr.txt` : it contains the names of non-valid trees.
+* `outputEmp.txt` : it contains the names of trees which don't have any sequences of the quadruplet.
 
 
 If you get additional data stored in a directory `new_dir`, you can avoid recomputation by using the following command :
@@ -109,3 +109,14 @@ To show a tree `file` in the graphic interface, one can use the following comman
 python3 tree.py file -s
 ```
 
+## Analysis of the data
+
+For the given data, I could get this output : 6840 valid quadruplets have been found over 4823 trees. There are 2998 non-valid trees and 682 empty trees.
+
+Among the valid trees, 23 of them aren't induced subtrees. For example, in the tree of the gene `ENSGT00840000129874`, there are three quadruplets and one of which isn't valid.
+
+
+<img src="image/Example3.png" width="50%">
+
+
+Moreover, some non-valid trees aren't valid because they are very complex. For example, the tree `ENSGT00760000118948` has nearly 46 special sequences and thus contains a lot of errors. Unfortunately, it seems quite difficult to analyse the 2998 non-valid trees with a computation without much complex criteria. Another trouble is that there are also too many non-valid trees to be analysed by hand. Thus, we can ask ourselves this question : Can these non-valid trees be ignored? Indeed, we still have a majority of data usable. However, when we have big trees, it is more likely to get an error and so, the biggest trees might be non-valid and we fail to consider these types of genes and we are maybe making some bias.
