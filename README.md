@@ -36,7 +36,7 @@ A tree is said *valid* if it has exactly the same number of each special sequenc
 
 In addition, a quadruplet is said *valid*, if there exists such an induced subtree containing exactly that quadruplet and no additional special sequences.
 
-##Type of a quadruplet
+## Type of a quadruplet
 
 If the quadruplet has the same structure of ancestors/descendant as the example above in this picture, we say that this quadruplet is of type *d+1* where *d* is the minimum number of branches dividing the quadruplet.
 
