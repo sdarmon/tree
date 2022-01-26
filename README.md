@@ -28,7 +28,7 @@ In terms of structure, this tree corresponds to the following phylogenetic tree 
 
 <img src="image/Example2.png" width="50%">
 
-Thus, the study of such trees can provide information about how genes had evolved among these species.
+Thus, the study of such trees can provide information about how genes have evolved among these species.
 
 ## Validity of a tree and a quadruplet
 
