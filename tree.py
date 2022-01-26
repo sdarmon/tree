@@ -2,6 +2,7 @@ from ete3 import Tree
 from os import walk
 import numpy as np
 import sys
+import threading
 
 def leaf_name(node):
 	"""
@@ -110,6 +111,10 @@ def loading(path):
 	return(RegTrees,ErrTrees,EmpTrees)
 
 def sub_tree(t):
+	"""
+	Input: t a tree
+	Output: the same tree, whitout any useless branches, but it can remain useless node
+	"""
 	if t.is_leaf():
 		if t.name[:3] == "APA" or t.name[:3] == "TRA":
 			return(t)
@@ -128,6 +133,10 @@ def sub_tree(t):
 			return(t2)
 
 def max_dist(t,subtree):
+	"""
+	Input: t an original tree and subtree, one of its embedded subtree.
+	Output: d+1 with d is the minimum number of branches that have to be remove the get the subtree as an induced subtree of t.
+	"""
 	leaves = leaf_name(subtree)
 	m = 0
 	for leaf in leaves:
@@ -136,7 +145,13 @@ def max_dist(t,subtree):
 					m = max(m,t.get_distance(leaf,leaf2, topology_only=True))
 	return(int(m)-2)
 
+
+
 def simplification_tree(t):
+	"""
+	Input: t a tree
+	Output: t2 a tree where every useless node have been removed.
+	"""
 	if t.is_leaf():
 		return(t)
 	elif len(t.children) == 1:
@@ -149,6 +164,10 @@ def simplification_tree(t):
 		return(t2)
 
 def type_quadra(t,i):
+	"""
+	Input: t a tree and i the d computed by the function max_dist
+	Output: The type of the tree t
+	"""
 	if len(t.children) == 2 :
 		a,b = t.children
 		if b.is_leaf and b.name[3:5] == "MA":
@@ -181,9 +200,15 @@ def type_quadra(t,i):
 
 
 def processing(path_directory,mode):
+	"""
+	Input: A path to a directory and mode, the mode of writing in files
+	Output: Nothing
+	"""
 	RegTrees,ErrTrees,EmpTrees = loading(path_directory)
 	comptDist = []
 	comptType = []
+	nb_quadra = 0
+	err = 0
 	with open('output.txt',mode) as f:
 		for L in RegTrees:
 			file = L[0][:-15]
@@ -198,6 +223,7 @@ def processing(path_directory,mode):
 				tree = simplification_tree(tree)
 				quadras.append(tree)
 				types.append(type_quadra(tree,dist))
+				nb_quadra+=1
 			S = file
 			for dist in types:
 				if dist != 1:
@@ -218,6 +244,7 @@ def processing(path_directory,mode):
 				nb = nb_seq(t)
 				quadras.append(simplification_tree(tree))
 				types.append(nb)
+				err+=1
 			S = file
 			for dist in types:
 				S = S+"\t"+str(dist)
@@ -230,8 +257,15 @@ def processing(path_directory,mode):
 			file = L[0][:-15]
 			f.write(file)
 			f.write('\n')
-	print("\nThere are",len(comptDist), "quadruplet(s) which aren't induced sub-tree(s) (",comptDist,")\n")
-	print("\nThere are",len(comptType), "quadruplet(s) which aren't organized according to the sequence AD,MU,MM,MA (",comptType,")\n")
+	print("\n", nb_quadra, "valid quadruplets have been found over",len(RegTrees), "trees and they have been stored in the file output.txt .\n")
+	print("\n There are", err, "non-valid trees (stored in the file outputErr.txt) and", len(EmpTrees),"empty trees (stored in the file outputEmp.txt).\n")
+	print("\nThere are",len(comptDist), "valid quadruplet(s) which aren't induced sub-tree(s) (",comptDist,")\n")
+	print("\nThere are",len(comptType), "valid quadruplet(s) which aren't organized according to the sequence AD,MU,MM,MA (",comptType,")\n")
+	return(None)
+
+def showing(argu,i):
+	t = Tree(argu)
+	print(t)
 	return(None)
 
 
@@ -242,6 +276,8 @@ def start():
 			 One can type the following command :
 			  -"python3 tree.py file" with "file" a name of a tree to print it in the console (the extention ".ReconciledTree" not mandatory)
 			  -"python3 tree.py file -s" to show the tree in an graphic interface
+			  -"python3 tree.py file -q" to show the quadruplet(s) of the tree in the console
+			  -"python3 tree.py file -sq" to show the quadruplet(s) of the tree in an graphic interface (if there are more than 2, they will be shown one by one)
 			  -"python3 tree.py directory" to find the quadruplets of the trees inside the directory
 			  -"python3 tree.py directory -a" to complete the files output.txt, outputErr.txt and outputEmp.txt with new trees of a directory
 	"""
@@ -263,13 +299,30 @@ def start():
 		else:
 			t = Tree(file+".ReconciledTree")
 		t.show()
+	elif len(Arg) == 2 and Arg[0][-1] != '/' and  Arg[1] == "-q": #Case file and show quadruplet
+		file = Arg[0]
+		if len(file) >15 and file[-15:] == ".ReconciledTree":
+			t = Tree(file)
+		else:
+			t = Tree(file+".ReconciledTree")
+		R,E,M = splitTree(t)
+		if R == []:
+			print("Warning: this tree hasn't any valid quadruplets")
+		for t2 in R:
+			print(simplification_tree(sub_tree(t2)))
+	elif len(Arg) == 2 and Arg[0][-1] != '/' and  Arg[1] == "-sq" or Arg[1] == "-qs": #Case file and show quadruplet
+		file = Arg[0]
+		if len(file) >15 and file[-15:] == ".ReconciledTree":
+			t = Tree(file)
+		else:
+			t = Tree(file+".ReconciledTree")
+		R,E,M = splitTree(t)
+		if R == []:
+			print("Warning: this tree hasn't any valid quadruplets")
+		for t2 in R:
+			t2=simplification_tree(sub_tree(t2))
+			t2.show()
 	else:
 		print("Wrong arguments given in input.")
 
 start()
-
-"""
-4823
-2998
-682
-"""
