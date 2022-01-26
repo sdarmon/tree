@@ -1,8 +1,6 @@
 from ete3 import Tree
 from os import walk
-import numpy as np
 import sys
-import threading
 
 def leaf_name(node):
 	"""
