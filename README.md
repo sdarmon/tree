@@ -32,7 +32,7 @@ Thus, the study of such trees can provide information about how genes have evolv
 
 ## Validity of a tree and a quadruplet
 
-A tree is said *valid* if it has exactly the same number of each special sequence and if we can divide each quadruplet from the others by taking an induced subtree (i.e. we can cut the tree in such a way that each induced subtree has exactly one quadruplet).
+A tree is said *valid* if it has exactly the same number of each special sequence and if we can split up each quadruplet from the others by taking an induced subtree (i.e. we can cut the tree in such a way that each induced subtree has exactly one quadruplet).
 
 In addition, a quadruplet is said *valid*, if there exists such an induced subtree containing exactly that quadruplet and no additional special sequences.
 
