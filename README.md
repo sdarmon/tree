@@ -108,3 +108,9 @@ To show a tree `file` in the graphic interface, one can use the following comman
 ```
 python3 tree.py file -s
 ```
+
+## Example 
+
+<img src="image/Example3.png" width="50%">
+
+This tree is an example of a tree containing three quadruplets and one of which isn't an induced subtree (the bottom one). These three quadruplets are stored in the output.txt file.
