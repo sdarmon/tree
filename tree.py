@@ -241,10 +241,9 @@ def parsing_seq(t):
 	Output: The names of all sequences in the same order without the extension
 	"""
 	L = leaf_name(t)
-	S = ""
 	for seq in L:
 		if seq[3:5] == "MA":
-			S = S+"\t"+seq.split("_")[0]
+			S = seq.split("_")[0]
 	for seq in L:
 		if seq[3:5] == "MM":
 			S = S+"\t"+seq.split("_")[0]
@@ -266,6 +265,8 @@ def processing(path_directory,mode):
 	comptType = []
 	nb_quadra = 0
 	with open('output.txt',mode) as f:
+		if mode == 'w':
+			f.write("Tree\tValidity\tType\tSequence_MA\tSequence_MM\tSequence_AD\tSequence_MU\tShape\n")
 		for L in RegTrees:
 			file = L[0][:-15]
 			trees = L[1:]
@@ -297,6 +298,8 @@ def processing(path_directory,mode):
 				S = file + "\t" + "invalid"+"\t"+str(typ)+"\t"+ parsing_seq(tree) +"\t" +tree_contraction(tree).write(format=9)+'\n'
 				f.write(S)
 	with open('outputErr.txt',mode) as f:
+		if mode == 'w':
+			f.write("Tree\tNumber_Special_Sequences\n")
 		for L in ErrTrees:
 			file = L[0][:-15]
 			t = L[1:][0]
@@ -304,6 +307,8 @@ def processing(path_directory,mode):
 			f.write(S)
 			f.write('\n')
 	with open('outputEmp.txt',mode) as f:
+		if mode == 'w':
+			f.write("Tree\n")
 		for L in EmpTrees:
 			file = L[0][:-15]
 			f.write(file)
