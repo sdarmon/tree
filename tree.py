@@ -1,6 +1,7 @@
 from ete3 import Tree
 from os import walk
 import sys
+import numpy as np
 
 def leaf_name(node):
 	"""
@@ -80,11 +81,11 @@ def splitTree(t):
 	ad,mu,mm,ma = Quadra
 	r = len(R)
 	if r == 0 and ad+mu+mm+ma == 0:
-		return([],[],[t])
+		return([],[],[t],[])
 	elif r == ad and r == mu and r == mm and r == ma :
-		return(R,[],[])
+		return(R,[],[],[])
 	else:
-		return([],[t],[])
+		return([],[t],[],R)
 
 
 def loading(path):
@@ -96,17 +97,20 @@ def loading(path):
 	RegTrees = []
 	ErrTrees = []
 	EmpTrees = []
+	SavTrees = []
 	for file in filenames:
 		t = Tree(path+file) #Loading tree
 		nb = nb_seq(t)
-		R,E,M = splitTree(t)
+		R,E,M,S = splitTree(t)
 		if R!= []:
 			RegTrees.append([file]+R[:])
 		if E != []:
 			ErrTrees.append([file]+E[:])
 		if M != []:
 			EmpTrees.append([file]+M[:])
-	return(RegTrees,ErrTrees,EmpTrees)
+		if S != []:
+			SavTrees.append([file] + S[:])
+	return(RegTrees,ErrTrees,EmpTrees,SavTrees)
 
 def sub_tree(t):
 	"""
@@ -197,57 +201,106 @@ def type_quadra(t,i):
 	return(-i)
 
 
+def tree_contraction(t):
+	""" 
+	Input : t the tree of a quadruplet
+	Output: A contraction of that tree(i.e. which node's names are 2 lettres)
+	"""
+	t2 = Tree()
+	if t.is_leaf():
+		t2.name = t.name[3:5]
+		return(t2)
+	L=[]
+	size = []
+	for child in t.children:
+		L.append(tree_contraction(child))
+		size.append(len(child))
+
+	if size == [1,1]:
+		n1 = L[0].name
+		n2 = L[1].name
+		if n1 < n2:
+			t2.add_child(L[0])
+			t2.add_child(L[1])
+		else:
+			t2.add_child(L[1])
+			t2.add_child(L[0])
+		return(t2)
+
+	while L != []:
+		i = np.argmin(size)
+		t2.add_child(L[i])
+		del L[i]
+		del size[i]
+
+	return(t2)
+
+def parsing_seq(t):
+	"""
+	Input : t the tree of a quadruplet
+	Output: The names of all sequences in the same order without the extension
+	"""
+	L = leaf_name(t)
+	S = ""
+	for seq in L:
+		if seq[3:5] == "MA":
+			S = S+"\t"+seq.split("_")[0]
+	for seq in L:
+		if seq[3:5] == "MM":
+			S = S+"\t"+seq.split("_")[0]
+	for seq in L:
+		if seq[3:5] == "AD":
+			S = S+"\t"+seq.split("_")[0]
+	for seq in L:
+		if seq[3:5] == "MU":
+			S = S+"\t"+seq.split("_")[0]
+	return(S)
+
 def processing(path_directory,mode):
 	"""
 	Input: A path to a directory and mode, the mode of writing in files
 	Output: Nothing
 	"""
-	RegTrees,ErrTrees,EmpTrees = loading(path_directory)
+	RegTrees,ErrTrees,EmpTrees,SavTrees = loading(path_directory)
 	comptDist = []
 	comptType = []
 	nb_quadra = 0
-	err = 0
 	with open('output.txt',mode) as f:
 		for L in RegTrees:
 			file = L[0][:-15]
 			trees = L[1:]
-			quadras = []
-			types = []
 			for t in trees:
 				tree = sub_tree(t)
 				dist = max_dist(t,tree)
 				if dist > 1 :
 					comptDist.append(file)
-				tree = simplification_tree(tree)
-				quadras.append(tree)
-				types.append(type_quadra(tree,dist))
-				nb_quadra+=1
-			S = file
-			for dist in types:
-				if dist != 1:
+				typ = type_quadra(tree,dist)
+				if typ < 0:
 					comptType.append(file)
-				S = S+"\t"+str(dist)
-			for tree in quadras:
-				S = S+"\t"+tree.write()
-			f.write(S)
-			f.write('\n')
+				tree = simplification_tree(tree)
+				nb_quadra+=1
+				S = file + "\t" + "valid"+"\t"+str(typ)+"\t"+ parsing_seq(tree) +"\t" +tree_contraction(tree).write(format=9)+'\n'
+				f.write(S)
+		for L in SavTrees:
+			file = L[0][:-15]
+			trees = L[1:]
+			for t in trees:
+				tree = sub_tree(t)
+				dist = max_dist(t,tree)
+				if dist > 1 :
+					comptDist.append(file)
+				typ = type_quadra(tree,dist)
+				if typ < 0:
+					comptType.append(file)
+				tree = simplification_tree(tree)
+				nb_quadra+=1
+				S = file + "\t" + "invalid"+"\t"+str(typ)+"\t"+ parsing_seq(tree) +"\t" +tree_contraction(tree).write(format=9)+'\n'
+				f.write(S)
 	with open('outputErr.txt',mode) as f:
 		for L in ErrTrees:
 			file = L[0][:-15]
-			trees = L[1:]
-			quadras = []
-			types = []
-			for t in trees:
-				tree= sub_tree(t)
-				nb = nb_seq(t)
-				quadras.append(simplification_tree(tree))
-				types.append(nb)
-				err+=1
-			S = file
-			for dist in types:
-				S = S+"\t"+str(dist)
-			for tree in quadras:
-				S = S+"\t"+tree.write()
+			t = L[1:][0]
+			S = file+"\t"+str(nb_seq(t))
 			f.write(S)
 			f.write('\n')
 	with open('outputEmp.txt',mode) as f:
@@ -255,17 +308,11 @@ def processing(path_directory,mode):
 			file = L[0][:-15]
 			f.write(file)
 			f.write('\n')
-	print("\n", nb_quadra, "valid quadruplets have been found over",len(RegTrees), "trees and they have been stored in the file output.txt .\n")
-	print("\n There are", err, "non-valid trees (stored in the file outputErr.txt) and", len(EmpTrees),"empty trees (stored in the file outputEmp.txt).\n")
-	print("\nThere are",len(comptDist), "valid quadruplet(s) which aren't induced subtrees (",comptDist,")\n")
-	print("\nThere are",len(comptType), "valid quadruplet(s) which aren't organized according to the sequence AD,MU,MM,MA (",comptType,")\n")
+	print("\n", nb_quadra, "valid quadruplets have been found over",len(RegTrees)+len(SavTrees), "trees and they have been stored in the file output.txt .\n")
+	print("\n There are", len(ErrTrees), "non-valid trees (stored in the file outputErr.txt) and", len(EmpTrees),"empty trees (stored in the file outputEmp.txt).\n")
+	print("\nThere are",len(comptDist), "valid quadruplet(s) which aren't induced subtrees.\n")
+	print("\nThere are",len(comptType), "valid quadruplet(s) which aren't organized according to the sequence MA,MM,MU,AD.\n")
 	return(None)
-
-def showing(argu,i):
-	t = Tree(argu)
-	print(t)
-	return(None)
-
 
 def start():
 	"""
@@ -303,10 +350,12 @@ def start():
 			t = Tree(file)
 		else:
 			t = Tree(file+".ReconciledTree")
-		R,E,M = splitTree(t)
-		if R == []:
+		R,E,M,S = splitTree(t)
+		if R == [] and S == []:
 			print("Warning: this tree hasn't any valid quadruplets")
 		for t2 in R:
+			print(simplification_tree(sub_tree(t2)))
+		for t2 in S:
 			print(simplification_tree(sub_tree(t2)))
 	elif len(Arg) == 2 and Arg[0][-1] != '/' and  Arg[1] == "-sq" or Arg[1] == "-qs": #Case file and show quadruplet
 		file = Arg[0]
@@ -314,10 +363,13 @@ def start():
 			t = Tree(file)
 		else:
 			t = Tree(file+".ReconciledTree")
-		R,E,M = splitTree(t)
-		if R == []:
+		R,E,M,S = splitTree(t)
+		if R == [] or S == []:
 			print("Warning: this tree hasn't any valid quadruplets")
 		for t2 in R:
+			t2=simplification_tree(sub_tree(t2))
+			t2.show()
+		for t2 in S:
 			t2=simplification_tree(sub_tree(t2))
 			t2.show()
 	else:

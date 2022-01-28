@@ -11,10 +11,10 @@ The data used is phylogenetic trees. They are Newick Trees and each leaf of each
 * ENS... : Correspond to original sequences of the phylogenetic tree (which can be found at https://www.ensembl.org/index.html )
 * TRA... and ADA... : Sequences added in the phylogenetic tree by the research team. We call them *special* sequences and they are divided into four additional species :
 
+	+ MA... : Hamster (Mesocricetus Auratus)
+	+ MM... : Mouse (Mus Musculus) 
 	+ AD... : Spiny Mouse (Acomys Dimidiatus)
 	+ MU... : Gerbil (Meriones Unguiculatus)
-	+ MM... : Mouse (Mus Minutoides) 
-	+ MA... : Hamster (Mesocricetus Auratus)
 
 We call *quadruplet* every quadruplet of those special sequences.
 
@@ -79,7 +79,7 @@ python3 tree.py dir
 First it will print some statistics on the trees and the numbers of quadruplets and most of all, it will create 3 text files :
 
 * `output.txt` : Each line of this file is following this format (the words are separated with one tab): `tree type1 type2 ... typeN quadra1 quadra2 ... quadraN` where `tree` is the name of the analysed tree, `type1`, `type2`, ...., `typeN` are the type of the `N` quadruplets found in that tree and `quadra1`, `quadra2`, ..., `quadraN` are the actual subtree of each quadruplet.
-* `outputErr.txt` : it contains the names of non-valid trees.
+* `outputErr.txt` : it contains over each line the name of an invalid tree and the number of special sequences inside itself.
 * `outputEmp.txt` : it contains the names of trees which don't have any sequences of the quadruplet.
 
 
@@ -111,7 +111,7 @@ python3 tree.py file -s
 
 ## Analysis of the data
 
-For the given data, I could get this output : 6840 valid quadruplets have been found over 4823 trees. There are 2998 non-valid trees and 682 empty trees.
+For the given data, I could get this output : 6840 valid quadruplets have been found over 4823 trees. There are 2998 invalid trees and 682 empty trees.
 
 Among the valid trees, 23 of them aren't induced subtrees. For example, in the tree of the gene `ENSGT00840000129874`, there are three quadruplets and one of which isn't an induced subtree.
 
@@ -119,4 +119,4 @@ Among the valid trees, 23 of them aren't induced subtrees. For example, in the t
 <img src="image/Example3.png" width="50%">
 
 
-Moreover, some non-valid trees aren't valid because they are very complex. For example, the tree `ENSGT00760000118948` has nearly 46 special sequences and thus contains a lot of errors. Unfortunately, it seems quite difficult to analyse the 2998 non-valid trees without using much complex criteria. Another trouble is that that number of non-valid trees is too high to be analysed by hand. Thus, we can ask ourselves this question : Can these non-valid trees be ignored? Indeed, we still have a majority of data usable. However, when we have big trees, it is more likely to get an error and so, the biggest trees might be non-valid and we fail to consider these types of trees and the related genes. We are maybe making some bias.
+Moreover, some invalid trees aren't valid because they are very complex. For example, the tree `ENSGT00760000118948` has nearly 46 special sequences and thus contains a lot of errors. Unfortunately, it seems quite difficult to analyse the 2998 invalid trees without using much complex criteria. Another trouble is that that number of invalid trees is too high to be analysed by hand. Thus, we can ask ourselves this question : Can these invalid trees be ignored? Indeed, we still have a majority of data usable. However, when we have big trees, it is more likely to get an error and so, the biggest trees might be invalid and we fail to consider these types of trees and the related genes. We are maybe making some bias.
