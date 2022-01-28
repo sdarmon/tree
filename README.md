@@ -78,7 +78,7 @@ python3 tree.py dir
 
 First it will print some statistics on the trees and the numbers of quadruplets and most of all, it will create 3 text files :
 
-* `output.txt` : Each line of this file is following this format (the words are separated with one tab): `tree type1 type2 ... typeN quadra1 quadra2 ... quadraN` where `tree` is the name of the analysed tree, `type1`, `type2`, ...., `typeN` are the type of the `N` quadruplets found in that tree and `quadra1`, `quadra2`, ..., `quadraN` are the actual subtree of each quadruplet.
+* `output.txt` : Each line of this file represents a quadruplet under this format (the words are separated with one tab): `tree type nameMA nameMM nameAD nameMU quadra` where `tree` is the name of the analysed tree, `type` the type of the quadruplet found in that tree, `nameMA nameMM nameAD nameMU` the name of the special sequences of that quadruplet and `quadra` the shape of that quadruplet.
 * `outputErr.txt` : it contains over each line the name of an invalid tree and the number of special sequences inside itself.
 * `outputEmp.txt` : it contains the names of trees which don't have any sequences of the quadruplet.
 
