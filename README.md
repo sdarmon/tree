@@ -108,15 +108,3 @@ To show a tree `file` in the graphic interface, one can use the following comman
 ```
 python3 tree.py file -s
 ```
-
-## Analysis of the data
-
-For the given data, I could get this output : 6840 valid quadruplets have been found over 4823 trees. There are 2998 invalid trees and 682 empty trees.
-
-Among the valid trees, 23 of them aren't induced subtrees. For example, in the tree of the gene `ENSGT00840000129874`, there are three quadruplets and one of which isn't an induced subtree.
-
-
-<img src="image/Example3.png" width="50%">
-
-
-Moreover, some invalid trees aren't valid because they are very complex. For example, the tree `ENSGT00760000118948` has nearly 46 special sequences and thus contains a lot of errors. Unfortunately, it seems quite difficult to analyse the 2998 invalid trees without using much complex criteria. Another trouble is that that number of invalid trees is too high to be analysed by hand. Thus, we can ask ourselves this question : Can these invalid trees be ignored? Indeed, we still have a majority of data usable. However, when we have big trees, it is more likely to get an error and so, the biggest trees might be invalid and we fail to consider these types of trees and the related genes. We are maybe making some bias.
